@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<title>Liam Mordue - Final Year Project</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<script>
+		//Disable debug security warning
+		process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = '1';
+
+		//Reassign 'module' keyword before loading jQuery
+		if (typeof module === 'object') {
+			window.module = module;
+			module = undefined;
+		}
+	</script>
+
+	<!--Bootstrap CSS-->
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+		integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+	<!--Icons-->
+	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+	<!--In-house style-->
+	<link href="css/style.css" rel="stylesheet">
+
+	<!--Leaflet resources-->
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+		integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+		crossorigin="" />
+	<script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+		integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+		crossorigin=""></script>
+
+	<!--Leaflet HTML legend-->
+	<link rel="stylesheet" href="css/leaflet-html-legend.css" />
+	<script src="js/leaflet-html-legend.js"></script>
+
+	<!--Leaflet icon layers-->
+	<link rel="stylesheet" href="css/leaflet-icon-layers.css" />
+	<script src="js/leaflet-icon-layers.js"></script>
+
+	<!--jQuery-->
+	<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+
+	<!--popper.js-->
+	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+		integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous">
+	</script>
+
+	<!--Bootstrap-->
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+		integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous">
+	</script>
+
+	<script>
+		//Now we've loaded jQuery we can reassign the module keyword
+		if (window.module) module = window.module;
+	</script>
+</head>
+
+<body>
+	<!--Loading spinner element-->
+	<div id="loading">
+		<div class="spinner-border text-info" role="status">
+		</div>
+	</div>
+
+	<!--Wrapper for Bootstrap Toasts-->
+	<div class="position-absolute w-100 p-4 d-flex flex-column align-items-end" id="alertWrapper">
+		<div class="w-25" id="alertInner">
+		</div>
+	</div>
+
+	<!--Base container element-->
+	<div class="container-fluid full-size">
+		<div class="row">
+			<!--Sidebar to hold nav icons-->
+			<div class="col-xs-1 sidebar">
+				<div class="nav flex-column nav-pills no-padding" id="v-pills-tab" role="tablist"
+					aria-orientation="vertical">
+					<a class="nav-link no-padding active" id="v-pills-home-tab" data-toggle="pill" href="#home-v"
+						role="tab" aria-controls="v-pills-home" aria-selected="true">
+						<i class="material-icons md-30">timeline</i>
+					</a>
+					<a class="nav-link no-padding" id="v-pills-profile-tab" data-toggle="pill" href="#profile-v"
+						role="tab" aria-controls="v-pills-profile" aria-selected="false">
+						<i class="material-icons md-30">insert_chart</i>
+					</a>
+					<a class="nav-link no-padding" id="v-pills-settings-tab" data-toggle="pill" href="#settings-v"
+						role="tab" aria-controls="v-pills-settings" aria-selected="false">
+						<i class="material-icons md-30">help</i>
+					</a>
+				</div>
+			</div>
+
+			<!--Page content holder-->
+			<div class="col-xs-11">
+				<!--Overview bar-->
+				<div class="col-xs-11" id="top-selector">
+					<table id="info-table">
+						<thead>
+							<tr class="table-row-width-half">
+								<td class="overview-table-entry overview-table-header" colspan="3">
+									<div class="dropdown" id="track-dropdown">
+										<button class="btn btn-info dropdown-toggle invisible-dropdown" type="button"
+											id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+											aria-expanded="false">Tracks</button>
+										<div class="dropdown-menu" aria-labelledby="dropdownMenuButton"
+											id="track-dropdown-menu">
+											<h6 class="dropdown-header">Loaded tracks</h6>
+										</div>
+									</div>
+								</td>
+
+								<td class="overview-table-entry overview-table-header">
+									<div class="dropdown" id="course-dropdown">
+										<button class="btn btn-info dropdown-toggle invisible-dropdown" type="button"
+											id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+											aria-expanded="false">
+											Courses
+										</button>
+										<div class="dropdown-menu" aria-labelledby="dropdownMenuButton"
+											id="course-dropdown-menu">
+											<h6 class="dropdown-header">Loaded courses</h6>
+										</div>
+									</div>
+								</td>
+								<th class="overview-table-entry overview-table-header">
+									<div class="dropdown" id="highlight-dropdown">
+										<button class="btn btn-info dropdown-toggle invisible-dropdown" type="button"
+											id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+											aria-expanded="false">
+											Styles
+										</button>
+										<div class="dropdown-menu" aria-labelledby="dropdownMenuButton"
+											id="highlight-dropdown-menu">
+											<h6 class="dropdown-header">Line style</h6>
+										</div>
+									</div>
+
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="table-row-width-quarter">
+								<td class="overview-table-entry">
+									<div class="text-muted">Name</div>
+									<div id="overview-label-trackname">No track loaded</div>
+								</td>
+								<td class="overview-table-entry">
+									<div class="text-muted">Time taken</div>
+									<div id="overview-label-time">N/A</div>
+								</td>
+								<td class="overview-table-entry">
+									<div class="text-muted">Pace</div>
+									<div id="overview-label-pace">N/A</div>
+								</td>
+								<td class="overview-table-entry">
+									<div class="text-muted">Name</div>
+									<div id="overview-label-coursename">No course loaded</div>
+								</td>
+								<td class="overview-table-entry">
+									<div class="text-muted">Style name</div>
+									<div id="overview-label-stylename">N/A</div>
+								</td>
+							</tr>
+							<tr class="table-row-width-quarter">
+								<td class="overview-table-entry">
+									<div class="text-muted">Distance</div>
+									<div id="overview-label-trackdistance">N/A</div>
+								</td>
+								<td class="overview-table-entry">
+									<div class="text-muted">Elevation difference</div>
+									<div id="overview-label-elevation">N/A</div>
+								</td>
+								<td class="overview-table-entry">
+									<div class="text-muted">Average heartrate</div>
+									<div id="overview-label-heartrate">N/A</div>
+								</td>
+								<td class="overview-table-entry" colspan="2">
+									<div class="text-muted">Distance</div>
+									<div id="overview-label-coursedistance">N/A</div>
+								</td>
+							</tr>
+						</tbody>
+
+					</table>
+				</div>
+
+				<!--Tab content holder-->
+				<div class="col tab-content" id="tab-container">
+					<!--Map tab-->
+					<div class="tab-pane active show fade" id="home-v">
+						<div class="row" style="display: flex;">
+							<div class="scroll-enable" id="legcol">
+								<ul class="list-group mh-100" id="way-list">
+									<div class="way-text-container">
+										<div class="alert alert-info way-text" role="alert">
+											Load a track<br />to view splits
+										</div>
+									</div>
+
+									<div class="accordion" id="accordionExample">
+									</div>
+								</ul>
+							</div>
+							<div class="no-padding" id="mapid">
+							</div>
+						</div>
+					</div>
+
+					<!--Charts tab-->
+					<div class="tab-pane tab-scrollable fade" id="profile-v">
+						<div class="list-group">
+							<div class="list-group-item flex-column align-items-start card chart-holder no-padding">
+								<div class="card-header header-grey">
+									Pace
+								</div>
+								<div class="card-body">
+									<canvas class="data-chart" id="chart-pace" width="400" height="400"></canvas>
+								</div>
+							</div>
+
+							<div class="list-group-item flex-column align-items-start card chart-holder no-padding">
+								<div class="card-header header-grey">
+									Altitude
+								</div>
+								<div class="card-body">
+									<canvas class="data-chart" id="chart-altitude" width="400" height="400"></canvas>
+								</div>
+							</div>
+
+							<div class="list-group-item flex-column align-items-start card chart-holder no-padding">
+								<div class="card-header header-grey">
+									Heartrate
+								</div>
+								<div class="card-body">
+									<canvas class="data-chart" id="chart-heartrate" width="400" height="400"></canvas>
+								</div>
+							</div>
+
+							<div class="list-group-item flex-column align-items-start card chart-holder no-padding">
+								<div class="card-header header-grey">
+									Speed
+								</div>
+								<div class="card-body">
+									<canvas class="data-chart" id="chart-speed" width="400" height="400"></canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!--About page-->
+					<div class="tab-pane fade" id="settings-v">
+						<h1>About</h1>
+						<p>Created by Liam Mordue B717558 for Loughborough University</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+
+		//Import alerts
+		const alert = require('./js/utils.js').createAlert;
+
+		//jQuery selectors for showing overview depending on page view
+		$('a[data-toggle="pill"]').on('shown.bs.tab', function (e) {
+			if ($(e.target).attr("href") === '#home-v' || $(e.target).attr("href") === '#profile-v') {
+				$("#top-selector").show()
+			} else {
+				$("#top-selector").hide();
+			}
+		})
+
+		//Ensure map element sizes properly with main window
+		$(window).resize(function () {
+			$('#mapid').css({
+				"align-items": "stretch"
+			});
+		});
+
+		//Map functions
+		require("./js/mapfuncs.js");
+
+		//Overview functions
+		require("./js/overview.js");
+
+		//Custom program menus
+		require('./js/menus.js');
+
+		//Chart functions
+		require('./js/charts.js');
+
+		//Activate tooltips
+		$(function () {
+			$('[data-toggle="tooltip"]').tooltip()
+		})
+
+		//Trigger loading overlay fadeout when main process dispatches dom-ready event
+		const render = require("electron").ipcRenderer;
+		render.on('dom-ready-check', function (event, data) {
+			$('#loading').fadeOut(500);
+		});
+	</script>
+</body>
+
+</html>
