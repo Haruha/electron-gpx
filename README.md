@@ -8,3 +8,11 @@ Used to display GPX files and relevant information about them. Orienteering GPX 
 
 `npm install` to download and install all dependencies
 `npm start` to run the program
+
+## Screenshots
+
+### Map view
+![](https://i.imgur.com/SDamwYP.png)
+
+### Chart view
+![](https://i.imgur.com/iqF8W5N.png)
