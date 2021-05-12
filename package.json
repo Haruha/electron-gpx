@@ -28,7 +28,7 @@
     "@mapbox/togeojson": "^0.16.0",
     "@turf/length": "^6.0.2",
     "@turf/turf": "^5.1.6",
-    "chart.js": "^2.9.3",
+    "chart.js": "^2.9.4",
     "chartjs": "^0.3.24",
     "chartjs-plugin-annotation": "^0.5.7",
     "chroma-js": "^2.1.0",
