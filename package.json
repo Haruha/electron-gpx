@@ -33,6 +33,6 @@
     "chartjs-plugin-annotation": "^0.5.7",
     "chroma-js": "^2.1.0",
     "custom-electron-titlebar": "^3.2.2-hotfix62",
-    "xmldom": "^0.2.1"
+    "xmldom": "^0.6.0"
   }
 }
